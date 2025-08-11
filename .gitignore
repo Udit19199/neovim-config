@@ -1,0 +1,25 @@
+# OS junk
+.DS_Store
+
+# Plugin manager lock file
+lazy-lock.json
+
+# Logs
+*.log
+
+# Temporary dirs
+v:null/
+
+# Swap/backup/undo files
+*.swp
+*.swo
+*.bak
+*.tmp
+*.undo
+
+# Compiled plugin loader files (if using packer)
+plugin/packer_compiled.lua
+
+# Personal/local configs
+local.lua
+
