@@ -23,22 +23,22 @@ return {
         "ts_ls",              -- TypeScript/JavaScript (updated from tsserver)
         "tailwindcss",        -- Tailwind CSS
         "eslint",             -- ESLint linting
-        
+
         -- Web technologies
         "html",               -- HTML
         "cssls",              -- CSS
         "emmet_ls",           -- HTML/CSS snippets
-        
+
         -- Data & APIs
         "jsonls",             -- JSON
         "graphql",            -- GraphQL
         "prismals",           -- Prisma ORM
-        
+
         -- Systems & DevOps
         "clangd",             -- C/C++
         "dockerls",           -- Docker
         "bashls",             -- Bash scripting
-        
+
         -- Config
         "lua_ls",             -- Lua (Neovim config)
       },
@@ -68,7 +68,6 @@ return {
         -- Next.js specific file types
         filetypes = { 
           "javascript", "javascriptreact", "typescript", "typescriptreact",
-          -- Next.js specific
           "typescript.tsx", "javascript.jsx"
         }
       })
@@ -125,7 +124,6 @@ return {
         capabilities = capabilities,
         filetypes = { 
           "html", "css", "scss", "sass", "less",
-          -- React/Next.js support
           "typescriptreact", "javascriptreact", "jsx", "tsx"
         }
       })
@@ -154,6 +152,7 @@ return {
             },
             workspace = {
               library = vim.api.nvim_get_runtime_file("", true),
+              checkThirdParty = false,
             },
             telemetry = {
               enable = false,
@@ -198,5 +197,7 @@ return {
   -- Schema store for JSON
   {
     "b0o/schemastore.nvim",
+    lazy = true,
   },
 }
+
