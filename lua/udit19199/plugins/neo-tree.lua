@@ -21,7 +21,7 @@ return {
         follow_current_file = { enabled = true }, -- auto-focus file
       },
       window = {
-        width = 30,
+        width = 50,
       },
     })
 

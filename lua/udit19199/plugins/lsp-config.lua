@@ -1,4 +1,5 @@
 return {
+  -- Mason: Package manager for LSP servers, linters, formatters, etc.
   {
     "williamboman/mason.nvim",
     lazy = false,
@@ -14,20 +15,22 @@ return {
       })
     end,
   },
+
+  -- Mason-LSPConfig: bridges Mason with nvim-lspconfig
   {
     "williamboman/mason-lspconfig.nvim",
     lazy = false,
     opts = {
       ensure_installed = {
         -- JavaScript/TypeScript ecosystem
-        "ts_ls",              -- TypeScript/JavaScript (updated from tsserver)
+        "ts_ls",              -- TypeScript/JavaScript
         "tailwindcss",        -- Tailwind CSS
         "eslint",             -- ESLint linting
 
         -- Web technologies
         "html",               -- HTML
         "cssls",              -- CSS
-        "emmet_ls",           -- HTML/CSS snippets
+        "emmet_ls",           -- Emmet for snippets
 
         -- Data & APIs
         "jsonls",             -- JSON
@@ -39,37 +42,40 @@ return {
         "dockerls",           -- Docker
         "bashls",             -- Bash scripting
 
-        -- Config
-        "lua_ls",             -- Lua (Neovim config)
+        -- Config (REMOVED lua_ls to prevent auto-setup)
+        -- We'll configure lua_ls manually only
       },
       automatic_installation = true,
+      -- Completely disable automatic setup
+      automatic_setup = false,
     },
   },
+
+  -- nvim-lspconfig: Core LSP client configs
   {
     "neovim/nvim-lspconfig",
     lazy = false,
     config = function()
-      local capabilities = require('cmp_nvim_lsp').default_capabilities()
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
       local lspconfig = require("lspconfig")
 
-      -- TypeScript/JavaScript with Next.js support
+      -- TypeScript/JavaScript
       lspconfig.ts_ls.setup({
         capabilities = capabilities,
         settings = {
           typescript = {
             inlayHints = {
-              includeInlayParameterNameHints = 'all',
+              includeInlayParameterNameHints = "all",
               includeInlayFunctionParameterTypeHints = true,
               includeInlayVariableTypeHints = true,
               includeInlayFunctionLikeReturnTypeHints = true,
-            }
-          }
+            },
+          },
         },
-        -- Next.js specific file types
-        filetypes = { 
+        filetypes = {
           "javascript", "javascriptreact", "typescript", "typescriptreact",
-          "typescript.tsx", "javascript.jsx"
-        }
+          "typescript.tsx", "javascript.jsx",
+        },
       })
 
       -- Tailwind CSS
@@ -77,7 +83,7 @@ return {
         capabilities = capabilities,
       })
 
-      -- HTML with better React support
+      -- HTML
       lspconfig.html.setup({
         capabilities = capabilities,
         filetypes = { "html", "templ" },
@@ -88,12 +94,12 @@ return {
         capabilities = capabilities,
       })
 
-      -- JSON
+      -- JSON with schemastore
       lspconfig.jsonls.setup({
         capabilities = capabilities,
         settings = {
           json = {
-            schemas = require('schemastore').json.schemas(),
+            schemas = require("schemastore").json.schemas(),
             validate = { enable = true },
           },
         },
@@ -103,35 +109,35 @@ return {
       lspconfig.eslint.setup({
         capabilities = capabilities,
         settings = {
-          workingDirectory = { mode = "auto" }
-        }
+          workingDirectory = { mode = "auto" },
+        },
       })
 
-      -- Prisma ORM
+      -- Prisma
       lspconfig.prismals.setup({
         capabilities = capabilities,
       })
 
-      -- C/C++ development
+      -- C/C++
       lspconfig.clangd.setup({
         capabilities = capabilities,
         cmd = { "clangd", "--background-index", "--clang-tidy", "--header-insertion=iwyu" },
         filetypes = { "c", "cpp", "cc", "cxx", "h", "hpp" },
       })
 
-      -- Emmet for fast HTML/CSS (supports JSX/TSX)
+      -- Emmet
       lspconfig.emmet_ls.setup({
         capabilities = capabilities,
-        filetypes = { 
+        filetypes = {
           "html", "css", "scss", "sass", "less",
-          "typescriptreact", "javascriptreact", "jsx", "tsx"
-        }
+          "typescriptreact", "javascriptreact", "jsx", "tsx",
+        },
       })
 
       -- GraphQL
       lspconfig.graphql.setup({
         capabilities = capabilities,
-        filetypes = { "graphql", "gql", "svelte", "astro", "vue", "typescript", "javascript" }
+        filetypes = { "graphql", "gql", "svelte", "astro", "vue", "typescript", "javascript" },
       })
 
       -- Docker
@@ -139,20 +145,42 @@ return {
         capabilities = capabilities,
       })
 
-      -- Lua (for Neovim config)
+      -- Bash
+      lspconfig.bashls.setup({
+        capabilities = capabilities,
+      })
+
+      -- Python (since pyright was in your health check)
+      lspconfig.pyright.setup({
+        capabilities = capabilities,
+        settings = {
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              diagnosticMode = "openFilesOnly",
+              useLibraryCodeForTypes = true,
+            },
+          },
+        },
+      })
+
+      -- SINGLE lua_ls configuration - this prevents duplicates
       lspconfig.lua_ls.setup({
         capabilities = capabilities,
         settings = {
           Lua = {
             runtime = {
-              version = "LuaJIT"
+              version = "LuaJIT",
             },
             diagnostics = {
-              globals = { "vim" },
+              globals = { "vim" }, -- Fix the vim global warning
             },
             workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
               checkThirdParty = false,
+              library = {
+                vim.fn.expand("$VIMRUNTIME/lua"),
+                vim.fn.stdpath("config") .. "/lua",
+              },
             },
             telemetry = {
               enable = false,
@@ -161,19 +189,10 @@ return {
         },
       })
 
-      -- Global LSP handlers for better UX
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = "rounded",
-      })
-
-      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        border = "rounded",
-      })
-
-      -- Diagnostic configuration
+      -- Updated diagnostic configuration
       vim.diagnostic.config({
         virtual_text = {
-          prefix = "●", -- Could be '■', '▎', 'x'
+          prefix = "◉", -- Clean unicode bullet point
         },
         signs = true,
         underline = true,
@@ -181,23 +200,23 @@ return {
         severity_sort = true,
         float = {
           border = "rounded",
-          source = "always",
+          source = "if_many",
           header = "",
           prefix = "",
         },
       })
 
-      -- Diagnostic keymaps
-      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+      -- Keymaps for diagnostics - using modern API
+      vim.keymap.set("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "Previous diagnostic" })
+      vim.keymap.set("n", "]d", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "Next diagnostic" })
       vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
       vim.keymap.set("n", "<leader>dl", vim.diagnostic.setloclist, { desc = "Diagnostic list" })
     end,
   },
-  -- Schema store for JSON
+
+  -- JSON Schema Store
   {
     "b0o/schemastore.nvim",
     lazy = true,
   },
 }
-
